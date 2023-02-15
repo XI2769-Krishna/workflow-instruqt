@@ -115,5 +115,3 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Deleting the dev version of ${{ inputs.slug }}-dev
-      
-      
