@@ -92,37 +92,32 @@ jobs:
         if: steps.track-pull.outcome == 'success'
         
   DeleteDevTracks:
+     runs-on: ubuntu-latest
      if: ${{ inputs.del == 'true' }}
      needs: [GetTrackSlugs, TestDevTracks]
-     runs-on: ubuntu-latest
      strategy:
        matrix: ${{ fromJson(needs.GetTrackSlugs.outputs.matrix) }}
        
      steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-        if: needs.TestDevTracks.steps.track-test.result == 'success'
         continue-on-error: false
         
       - name: Update file permissions
         run: sudo chmod -R a+rwx ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}-dev
-        if: needs.TestDevTracks.steps.track-test.result == 'success'
 
       - name: Delete dev track
         uses: ./.github/actions/track-delete
         with:
           path: ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}-dev
-        if: needs.TestDevTracks.steps.track-test.result == 'success'
         
       - name: Delete dev dir
         uses: JesseTG/rm@v1.0.3
         with:
           path: ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}-dev
-        if: needs.TestDevTracks.steps.track-test.result == 'success'
           
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Deleting the dev version of ${{ matrix.tracks.slug }}-dev  
-        if: needs.TestDevTracks.steps.track-test.result == 'success'
         
