@@ -88,7 +88,7 @@ jobs:
         id: track-test
         uses: ./.github/actions/track-test
         with:
-          path: ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug1 }}
+          path: ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}
         if: steps.track-pull.outcome == 'success'
         
   DeleteDevTracks:
