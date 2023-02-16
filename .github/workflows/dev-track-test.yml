@@ -97,11 +97,9 @@ jobs:
      needs: [GetTrackSlugs, TestDevTracks]
      strategy:
        matrix: ${{ fromJson(needs.GetTrackSlugs.outputs.matrix) }}
-       
      steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-        continue-on-error: false
         
       - name: Update file permissions
         run: sudo chmod -R a+rwx ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}-dev
