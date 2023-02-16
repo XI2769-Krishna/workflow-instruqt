@@ -92,7 +92,7 @@ jobs:
         
   DeleteDevTracks:
      runs-on: ubuntu-latest  
-     if: ${{ inputs.del }} == 'true'
+     if: ${{ inputs.del == 'true' }}
      
      needs: GetTrackSlugs
      strategy:
