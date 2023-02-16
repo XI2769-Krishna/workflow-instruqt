@@ -27,7 +27,7 @@ on:
     inputs:
       del:
         description: Do you want delete dev track?
-        required: false
+        required: true
         type: string
     branches:    
       - '!main'
@@ -90,9 +90,18 @@ jobs:
           path: ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}
         if: steps.track-pull.outcome == 'success'
         
+  DeleteTracks:
+     runs-on: ubuntu-latest  
+     if: ${{ inputs.del }} == 'false'
+     steps:
+     
+      - name: Check out repository code
+        run: echo "Not deleted dev track"
+        
   DeleteDevTracks:
      runs-on: ubuntu-latest  
      if: ${{ inputs.del }} == 'true'
+     
      needs: GetTrackSlugs
      strategy:
       matrix: ${{ fromJson(needs.GetTrackSlugs.outputs.matrix) }}
@@ -117,4 +126,5 @@ jobs:
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Deleting the dev version of ${{ matrix.tracks.slug }}-dev
+          commit_message: Deleting the dev version of ${{ matrix.tracks.slug }}-dev  
+        
