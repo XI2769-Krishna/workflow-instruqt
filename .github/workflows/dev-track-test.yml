@@ -85,6 +85,7 @@ jobs:
         if: steps.track-pull.outcome == 'success'
       
       - name: Track Test
+        id: track-test
         uses: ./.github/actions/track-test
         with:
           path: ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}
@@ -92,7 +93,7 @@ jobs:
         
   DeleteDevTracks:
      runs-on: ubuntu-latest  
-     if: ${{ inputs.del == 'true' }}
+     if: steps.track-test.outcome == 'success' && ${{ inputs.del == 'true' }}
      
      needs: GetTrackSlugs
      strategy:
