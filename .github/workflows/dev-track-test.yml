@@ -93,7 +93,7 @@ jobs:
         
   DeleteDevTracks:
      runs-on: ubuntu-latest  
-     if: steps.track-test.outcome == 'success' && ${{ inputs.del == 'true' }}
+     if: ${{ inputs.del == 'true' }}
      
      needs: GetTrackSlugs
      strategy:
@@ -110,11 +110,13 @@ jobs:
         uses: ./.github/actions/track-delete
         with:
           path: ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}-dev
+        if: steps.track-test.outcome == 'success'
       
       - name: Delete dev dir
         uses: JesseTG/rm@v1.0.3
         with:
           path: ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}-dev
+        if: steps.track-test.outcome == 'success'
           
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v4
