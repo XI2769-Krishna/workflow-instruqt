@@ -27,7 +27,7 @@ on:
     inputs:
       del:
         description: Do you want delete dev track?
-        required: true
+        required: false
         type: string
     branches:    
       - '!main'
@@ -85,33 +85,37 @@ jobs:
         if: steps.track-pull.outcome == 'success'
       
       - name: Track Test
+        id: track-test
         uses: ./.github/actions/track-test
         with:
           path: ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}
         if: steps.track-pull.outcome == 'success'
         
   DeleteDevTracks:
-     runs-on: ubuntu-latest  
-     if: ${{ inputs.del }} == 'true'
+     runs-on: ubuntu-latest
+     if: ${{ inputs.del == 'true' }}
+     needs: [GetTrackSlugs, TestDevTracks]
+     strategy:
+       matrix: ${{ fromJson(needs.GetTrackSlugs.outputs.matrix) }}
      steps:
-     
       - name: Check out repository code
         uses: actions/checkout@v3
-
+        
       - name: Update file permissions
-        run: sudo chmod -R a+rwx ${{ env.TRACK_DIR }}/${{ inputs.slug }}-dev
+        run: sudo chmod -R a+rwx ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}-dev
 
       - name: Delete dev track
         uses: ./.github/actions/track-delete
         with:
-          path: ${{ env.TRACK_DIR }}/${{ inputs.slug }}-dev
-      
+          path: ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}-dev
+        
       - name: Delete dev dir
         uses: JesseTG/rm@v1.0.3
         with:
-          path: ${{ env.TRACK_DIR }}/${{ inputs.slug }}-dev
+          path: ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}-dev
           
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Deleting the dev version of ${{ inputs.slug }}-dev
+          commit_message: Deleting the dev version of ${{ matrix.tracks.slug }}-dev  
+        
