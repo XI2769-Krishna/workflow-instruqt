@@ -27,7 +27,7 @@ on:
     inputs:
       del:
         description: Do you want delete dev track?
-        required: false
+        required: true
         type: string
     branches:    
       - '!main'
