@@ -16,7 +16,7 @@ concurrency:
 
 on: 
   pull_request:
-    types: closed
+    types: [closed]
   workflow_dispatch:
     inputs:
       slug:
