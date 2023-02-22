@@ -18,38 +18,53 @@ on:
   pull_request:
     types: [closed]
   workflow_dispatch:
-    inputs:
-      slug:
-        description: Track Slug
-        required: true
-        type: string
-    branches:    
-      - '!main'
-      - '!master'
 
 jobs:
-  DeleteDevtrack:
+  GetTrackSlugs:
     runs-on: ubuntu-latest
     steps:
+    - name: Check out repository code
+      uses: actions/checkout@v3
+    
+    - name: Install yq Package
+      uses: ./.github/actions/install-yq
+    
+    - name: Create Matrix Data
+      run: echo "TRACKS=$(yq -o j $TRACK_DIR/track-slugs.yml | jq tostring | sed -e 's/^"//' -e 's/"$//')" >> $GITHUB_ENV
 
+    - id: set-matrix
+      run: echo "::set-output name=matrix::${{ env.TRACKS }}"
+
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      
+  DeleteDevTracks:
+     runs-on: ubuntu-latest
+     if: ${{ needs.GetTrackSlugs.outputs.matrix != '[]' && needs.GetTrackSlugs.outputs.matrix != '' }}
+     needs: GetTrackSlugs
+     strategy:
+       matrix: ${{ fromJson(needs.GetTrackSlugs.outputs.matrix) }}
+     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-
+        
       - name: Update file permissions
-        run: sudo chmod -R a+rwx ${{ env.TRACK_DIR }}/${{ inputs.slug }}-dev
+        run: sudo chmod -R a+rwx ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}-dev
 
       - name: Delete dev track
         uses: ./.github/actions/track-delete
         with:
-          path: ${{ env.TRACK_DIR }}/${{ inputs.slug }}-dev
-      
+          path: ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}-dev
+        
       - name: Delete dev dir
         uses: JesseTG/rm@v1.0.3
         with:
-          path: ${{ env.TRACK_DIR }}/${{ inputs.slug }}-dev
+          path: ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}-dev
           
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Deleting the dev version of ${{ inputs.slug }}-dev
+          commit_message: Deleting the dev version of ${{ matrix.tracks.slug }}-dev  
+        
+
 
