@@ -15,9 +15,15 @@ concurrency:
   cancel-in-progress: true
 
 on: 
-  pull_request:
-    types: [closed]
   workflow_dispatch:
+    inputs:
+      slug:
+        description: Track Slug
+        required: true
+        type: string
+    branches:    
+      - '!main'
+      - '!master
 
 jobs:
   GetTrackSlugs:
