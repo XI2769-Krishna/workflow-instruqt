@@ -58,6 +58,11 @@ jobs:
         uses: ./.github/actions/track-delete
         with:
           path: ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}-dev
+      
+      - name: Delete dev dir
+        uses: JesseTG/rm@v1.0.3
+        with:
+          path: ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}-dev
           
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v4
