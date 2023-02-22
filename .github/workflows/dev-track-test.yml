@@ -86,7 +86,7 @@ jobs:
         
   DeleteDevTracks:
      runs-on: ubuntu-latest
-     if: ${{ env.DELETE_DEV_TRACK == 'y' }}
+     if: ${{ env.DELETE_DEV_TRACK }} == 'y'
      needs: [GetTrackSlugs, TestDevTracks]
      strategy:
        matrix: ${{ fromJson(needs.GetTrackSlugs.outputs.matrix) }}
