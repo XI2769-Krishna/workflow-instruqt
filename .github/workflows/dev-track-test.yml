@@ -15,7 +15,7 @@ env:
   # have a track-slugs.yml file in your tracks directory.
   TRACK_DIR: instruqt-tracks
   INSTRUQT_TOKEN: ${{ secrets.INSTRUQT_TOKEN }}
-  DELETE_DEV_TRACK: TRUE
+  DELETE_DEV_TRACK: true
 
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
@@ -86,7 +86,7 @@ jobs:
         
   DeleteDevTracks:
      runs-on: ubuntu-latest
-     if: ${{ env.DELETE_DEV_TRACK == 'TRUE' }}
+     if: ${{ env.DELETE_DEV_TRACK == 'true' }}
      needs: [GetTrackSlugs, TestDevTracks]
      strategy:
        matrix: ${{ fromJson(needs.GetTrackSlugs.outputs.matrix) }}
