@@ -24,15 +24,7 @@ on:
   pull_request:
     types: [opened, reopened, edited, synchronize]
   workflow_dispatch:
-    inputs:
-      del:
-        description: Do you want delete dev track?
-        required: true
-        type: string
-    branches:    
-      - '!main'
-      - '!master'
-
+  
 jobs:
   GetTrackSlugs:
     runs-on: ubuntu-latest
@@ -93,7 +85,7 @@ jobs:
         
   DeleteDevTracks:
      runs-on: ubuntu-latest
-     if: ${{ inputs.del == 'true' }}
+     if: ${{ needs.GetTrackSlugs.outputs.matrix != '[]' && needs.GetTrackSlugs.outputs.matrix != '' }}
      needs: [GetTrackSlugs, TestDevTracks]
      strategy:
        matrix: ${{ fromJson(needs.GetTrackSlugs.outputs.matrix) }}
