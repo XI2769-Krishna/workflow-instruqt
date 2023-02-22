@@ -15,6 +15,7 @@ env:
   # have a track-slugs.yml file in your tracks directory.
   TRACK_DIR: instruqt-tracks
   INSTRUQT_TOKEN: ${{ secrets.INSTRUQT_TOKEN }}
+  DELETE_DEV: true
 
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
@@ -24,15 +25,7 @@ on:
   pull_request:
     types: [opened, reopened, edited, synchronize]
   workflow_dispatch:
-    inputs:
-      del:
-        description: Do you want delete dev track?
-        required: true
-        type: string
-    branches:    
-      - '!main'
-      - '!master'
-
+  
 jobs:
   GetTrackSlugs:
     runs-on: ubuntu-latest
@@ -93,23 +86,26 @@ jobs:
         
   DeleteDevTracks:
      runs-on: ubuntu-latest
-     if: ${{ inputs.del == 'true' }}
      needs: [GetTrackSlugs, TestDevTracks]
      strategy:
        matrix: ${{ fromJson(needs.GetTrackSlugs.outputs.matrix) }}
      steps:
       - name: Check out repository code
+        if: env.DELETE_DEV == 'true'
         uses: actions/checkout@v3
         
       - name: Update file permissions
+        if: env.DELETE_DEV == 'true'
         run: sudo chmod -R a+rwx ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}-dev
 
       - name: Delete dev track
+        if: env.DELETE_DEV == 'true'
         uses: ./.github/actions/track-delete
         with:
           path: ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}-dev
         
       - name: Delete dev dir
+        if: env.DELETE_DEV == 'true'
         uses: JesseTG/rm@v1.0.3
         with:
           path: ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}-dev
