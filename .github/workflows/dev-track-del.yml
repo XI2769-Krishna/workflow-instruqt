@@ -14,9 +14,7 @@ concurrency:
   group: ${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
-on: 
-  pull_request:
-    types: [closed]
+on:
   workflow_dispatch:
 
 jobs:
