@@ -1,7 +1,0 @@
-{
-  "query": "query {
-    track(trackID: \"4rirpiwhdxyu\") {
-      tags
-    }
-  }"
-}
