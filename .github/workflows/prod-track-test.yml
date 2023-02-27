@@ -94,3 +94,13 @@ jobs:
         with:
           path: ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}
         if: steps.check-ci.outcome == 'success'
+        
+      - name: Delete dev dir
+        uses: JesseTG/rm@v1.0.3
+        with:
+          path: ${{ env.TRACK_DIR }}/${{ matrix.tracks.slug }}-dev
+          
+      - name: Commit Changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Deleting the dev version of ${{ matrix.tracks.slug }}-dev in main 
